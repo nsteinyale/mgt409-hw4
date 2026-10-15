@@ -111,3 +111,13 @@ Homework 4: Campus Customs Shop + Chatbot. This file logs what I typed to my vib
 - Identity comes only from the login, never from claims in the chat.
 
 A red-team test (`tests/safety_check.py`, 16/16) tried a fake "store manager", requests for another customer's email, a typed card number, a jailbreak, and insistent off-topic questions. It also caught a mislabeled audit field (`page_results_sent`), which was fixed.
+
+## Problem 13: Push to GitHub and submit the URL
+
+**Prompt I typed:** "Now we wrap up and submit: push it to GitHub and submit the URL. Put the code in a folder called hw4 and push it to a public GitHub repo. On Canvas we will submit that URL to the graders, so they need to be able to open it and clone it; do not upload a zip. Do not put our real .env, campus_customs.db, or product images in the git repo. Use .gitignore, including .env.example with placeholders only. The agent itself is four files under backend/: prompts/prompt.md, agent.py, tools.py, and models.py (can you explain to me as well how an agent can be four files?). README.md should explain how to run the front end and back end after placing the data pack."
+
+**Follow-up prompt:** None needed. Before publishing, the assistant asked me to confirm the public repo name, to use my GitHub private email instead of my Yale email in the public commit history, and to include the test screenshots.
+
+**What was missing after the first prompt:** I didn't think about where graders would unzip the data pack. The official `data.zip` unzips to `data/campus_customs.db`, but our code only looked in `data/data/` (how I had extracted it), so a grader's copy wouldn't have found the database. The backend and tests now find the data in either place, with a clear error if it's missing. The assistant also scanned the repo for my API key, tokens, password hashes, and real people's emails before pushing, then cloned the public repo fresh, placed the data pack, and confirmed the backend runs (including a real chat answer) and the front end builds.
+
+**Repo:** https://github.com/nsteinyale/mgt409-hw4 (code in `hw4/`)
