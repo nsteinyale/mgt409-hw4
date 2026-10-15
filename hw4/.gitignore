@@ -1,0 +1,23 @@
+# Secrets: never commit real keys (commit .env.example with blank placeholders instead)
+.env
+.env.*
+!.env.example
+backend/.session_secret
+
+# Course data pack: the database and product images are provided separately (see README)
+data/
+*.db
+*.sqlite
+*.zip
+
+# Dependencies and build output
+node_modules/
+dist/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Temporary files from the audit writer
+output/*.tmp
+output/audit_trail.unreadable-*.json

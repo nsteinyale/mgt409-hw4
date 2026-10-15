@@ -1,0 +1,10 @@
+# Never commit secrets or the course data pack (see hw4/.gitignore for details)
+.env
+**/.env
+**/.session_secret
+**/data/
+*.db
+*.zip
+**/node_modules/
+**/__pycache__/
+.venv/

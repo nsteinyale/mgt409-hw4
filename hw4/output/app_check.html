@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Campus Customs: app check</title>
+<style>
+  body { font-family: 'Open Sans', system-ui, sans-serif; color: #1c2430; max-width: 1000px; margin: 0 auto; padding: 2rem 1.25rem 4rem; line-height: 1.55; }
+  h1, h2 { font-family: Georgia, 'Times New Roman', serif; color: #00356b; }
+  h1 { margin-bottom: 0.25rem; }
+  h2 { margin-top: 3rem; border-bottom: 3px solid #d4af37; padding-bottom: 0.3rem; }
+  .meta { color: #6b7280; font-size: 0.9rem; }
+  .summary { border-collapse: collapse; margin: 1rem 0; }
+  table { border-collapse: collapse; margin: 0.75rem 0; font-size: 0.92rem; }
+  th, td { border: 1px solid #e3e6eb; padding: 0.35rem 0.7rem; text-align: left; }
+  th { background: #f6f7f9; }
+  td.zero { color: #b42318; font-weight: 700; }
+  figure { margin: 1rem 0 1.5rem; }
+  img { width: 100%; border: 1px solid #e3e6eb; border-radius: 10px; box-shadow: 0 6px 18px rgba(0, 38, 77, 0.1); }
+  .pair { display: grid; grid-template-columns: 1.6fr 1fr; gap: 1rem; align-items: start; }
+  figcaption { font-size: 0.92rem; color: #374151; margin-top: 0.45rem; }
+  .quote { background: #f3f7fc; border-left: 4px solid #00356b; padding: 0.6rem 0.9rem; margin: 0.6rem 0; white-space: pre-wrap; }
+  .pass { background: #e6f4ec; color: #1f7a4d; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 999px; }
+  .fail { background: #fdecea; color: #b42318; font-weight: 700; padding: 0.1rem 0.5rem; border-radius: 999px; }
+  code { background: #f6f7f9; padding: 0.05rem 0.3rem; border-radius: 4px; }
+</style>
+</head>
+<body>
+<h1>Campus Customs: app check</h1>
+<p class="meta">Tested on the live site (<code>localhost:5180</code>, FastAPI on <code>:8000</code>) in a real Chromium browser on October 15, 2026 at 04:50 PM.
+Every number below was read from <code>data/data/campus_customs.db</code> at the same time as the screenshot. Re-run with <code>tests/app_check.py</code>.</p>
+
+<table class="summary">
+  <tr><th>Check</th><th>Result</th></tr>
+  <tr><td>1. Chat checks an item's inventory and price</td><td><span class="pass">PASS</span></td></tr>
+  <tr><td>2. "hoodies?" puts dynamic result cards on the page</td><td><span class="pass">PASS</span></td></tr>
+  <tr><td>3. Usability feature (Problem 9): suggestion chip + "find a similar one"</td><td><span class="pass">PASS</span></td></tr>
+</table>
+
+<h2>1. Chat checks the inventory level of an item</h2>
+<p>On the Baseball Left Chest Crewneck product page, the shopper asks:</p>
+<div class="quote">How many Baseball Left Chest Crewnecks do you have in medium, and how much are they? Is XL in stock?</div>
+<p>Dan replied:</p>
+<div class="quote">There are 5 Baseball Left Chest Crewnecks in medium, priced at $58.00 each. XL is currently out of stock; sizes S, M, L, and XXL are available. Want me to help find a similar crewneck in XL?</div>
+<p>What the database says at the same moment (<code>catalogue</code> and <code>inventory</code> tables):</p>
+<table>
+  <tr><th>Product</th><th>Price</th><th>XS</th><th>S</th><th>M</th><th>L</th><th>XL</th><th>XXL</th></tr>
+  <tr><td>Baseball Left Chest Crewneck</td><td>$58.00</td><td class="zero">0</td><td class="">15</td><td class="">5</td><td class="">25</td><td class="zero">0</td><td class="">25</td></tr>
+</table>
+<p>Price matches: <span class="pass">PASS</span> · M quantity matches: <span class="pass">PASS</span> · XL clearly out of stock: <span class="pass">PASS</span></p>
+<div class="pair">
+  <figure><img src="app_check_images/inventory.png" alt="Product page with the chat answering a stock question">
+    <figcaption>The chat answers on the product page. The price and the per-size stock in the reply are the database values above, not guesses.</figcaption></figure>
+  <figure><img src="app_check_images/inventory_chat.png" alt="Close-up of the chat reply">
+    <figcaption>Close-up of the question and the full reply. The green line ("✓ 1 price/stock fact checked against live inventory") is the Problem 9 fact-check: before the reply was shown, the price/stock figures it found next to the product name were compared with the database. The table above checks every number.</figcaption></figure>
+</div>
+
+<h2>2. Dynamic search result cards after "hoodies?"</h2>
+<p>From the home page the shopper types <code>hoodies?</code> in the chat. Dan replied:</p>
+<div class="quote">I found 27 hoodies and put them all on the page for you. A few favorites: Basic Hoodie Big Yale, Champion Reverse Weave Hoodie 1, District Vit Hoodie Vintage Bulldog, and Champion Full Zip Hood. Boola boola!</div>
+<p>The site switched to <code>/products?view=chat</code> and showed <strong>27</strong> product cards under "Yale Hoodies". The database has <strong>27</strong> hoodies.
+All cards are hoodies: <span class="pass">PASS</span> · Every card's price matches the database: <span class="pass">PASS</span></p>
+<figure><img src="app_check_images/search_results.png" alt="Products page filled with hoodie cards from the chat">
+  <figcaption>The chat's search results reach the page as cards (photo, name, price, short description, sizes in stock) under a banner from the assistant. Nothing was clicked: the page updated from the chat answer.</figcaption></figure>
+<figure><img src="app_check_images/search_card_detail.png" alt="Single-item page opened from a search card">
+  <figcaption>Clicking the first card (Basic Hoodie Big Yale) still opens the Problem 3 single-item page with the large image, full description, price, colors, and sizes.</figcaption></figure>
+
+<h2>3. Usability feature from Problem 9: suggestion chip + "find a similar one"</h2>
+<p>On the Basic Hoodie Big Yale page (colors in the database: navy blue, white), the chat shows one-tap chips that fit the page: What sizes are in stock? · Do you have this in gray? · Something similar but cheaper?.
+The shopper taps <strong>"Do you have this in gray?"</strong>. Dan replied:</p>
+<div class="quote">This one doesn’t come in gray—only navy blue and white. I found several gray hoodie alternatives, including District Vit Hoodie Vintage Bulldog and District Vit Hoodie Vintage Sailor Bulldog, both $68.00. Boola boola!</div>
+<p>The gray alternatives it showed, with their colors from the database:</p>
+<table><tr><th>Suggested product</th><th>Colors in the database</th></tr><tr><td>District Vit Hoodie Vintage Bulldog</td><td>dark heather gray, white</td></tr><tr><td>District Vit Hoodie Vintage Sailor Bulldog</td><td>charcoal gray, white</td></tr></table>
+<div class="pair">
+  <figure><img src="app_check_images/usability_gray_chip.png" alt="Product page with the gray suggestion answered">
+    <figcaption>One tap on a suggestion chip, no typing. The agent's <code>find_similar_products</code> tool found real gray hoodies instead of a dead-end "no".</figcaption></figure>
+  <figure><img src="app_check_images/usability_gray_chip_chat.png" alt="Close-up of chips and gray alternatives">
+    <figcaption>Close-up: the original hoodie honestly doesn't come in gray, and every suggested alternative does, as the database table above confirms.</figcaption></figure>
+</div>
+</body>
+</html>
